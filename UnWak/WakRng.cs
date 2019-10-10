@@ -1,6 +1,6 @@
 ﻿namespace UnWak
 {
-    class WakRng
+    public class WakRng
     {
         private double state;
 

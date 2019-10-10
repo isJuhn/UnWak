@@ -6,7 +6,7 @@ namespace UnWak
     class Program
     {
         static void Main(string[] args)
-        {            
+        {
             if (args.Length == 0)
             {
                 Console.WriteLine("Usage: UnWak [FILE] [<path>]");
@@ -14,11 +14,20 @@ namespace UnWak
                 return;
             }
 
-            byte[] wak_buffer;
-            using (FileStream wak_file = File.OpenRead(args[0]))
+            byte[] wak_buffer = null;
+
+            try
             {
-                wak_buffer = new byte[wak_file.Length];
-                wak_file.Read(wak_buffer, 0, (int)wak_file.Length);
+                using (FileStream wak_file = File.OpenRead(args[0]))
+                {
+                    wak_buffer = new byte[wak_file.Length];
+                    wak_file.Read(wak_buffer, 0, (int)wak_file.Length);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to read wak file: {e}");
+                Environment.Exit(-1);
             }
 
             FiletableEntry[] filetable = WakDecryptor.DecryptWak(wak_buffer);
@@ -31,10 +40,19 @@ namespace UnWak
             {
                 FiletableEntry filetable_entry = filetable[i];
                 string path = Path.Combine(parent_path, filetable_entry.filename);
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-                using (FileStream file = File.Create(path))
+
+                try
                 {
-                    file.Write(wak_buffer, filetable_entry.file_offset, filetable_entry.file_size);
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                    using (FileStream file = File.Create(path))
+                    {
+                        file.Write(wak_buffer, filetable_entry.file_offset, filetable_entry.file_size);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"\nFailed to write file {path}: {e}");
+                    Environment.Exit(-1);
                 }
 
                 if (i % (filetable.Length / 100) == 0)

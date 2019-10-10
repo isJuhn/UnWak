@@ -1,13 +1,13 @@
 ﻿namespace UnWak
 {
-    struct FiletableEntry
+    public struct FiletableEntry
     {
         public int file_offset;
         public int file_size;
         public string filename;
     }
 
-    class Constants
+    public class Constants
     {
         public static readonly int wak_key_seed = 0;
         public static readonly int wak_header_IV_seed = 1;
