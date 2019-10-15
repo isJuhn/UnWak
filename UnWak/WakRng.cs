@@ -7,6 +7,10 @@
         public WakRng(double seed)
         {
             state = seed;
+            if (state >= 2147483647.0)
+            {
+                state *= 0.5;
+            }
             Next();
         }
 
